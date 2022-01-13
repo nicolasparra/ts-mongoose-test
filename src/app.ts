@@ -1,35 +1,22 @@
 import express from "express";
 import morgan from "morgan";
-// import exphbs from "express-handlebars";
 import { PORT } from "./config";
 
 // Routes
-// import indexRoutes from "./routes";
-// import tasksRoutes from "./routes/tasks";
+import UserRouter from "./routes/User.router";
 
-class Applicaction {
+class App {
   app: express.Application;
 
   constructor() {
     this.app = express();
     this.settings();
     this.middlewares();
-    // this.routes();
+    this.routes();
   }
 
   settings() {
     this.app.set("port", PORT);
-    // this.app.set("views", path.join(__dirname, "views"));
-    // this.app.engine(
-    //   ".hbs",
-    //   exphbs({
-    //     layoutsDir: path.join(this.app.get("views"), "layouts"),
-    //     partialsDir: path.join(this.app.get("views"), "partials"),
-    //     defaultLayout: "main",
-    //     extname: ".hbs",
-    //   })
-    // );
-    // this.app.set("view engine", ".hbs");
   }
 
   middlewares() {
@@ -38,12 +25,9 @@ class Applicaction {
     this.app.use(express.json());
   }
 
-  //   routes() {
-  //     this.app.use("/", indexRoutes);
-  //     this.app.use("/tasks", tasksRoutes);
-
-  //     this.app.use(express.static(path.join(__dirname, "public")));
-  //   }
+  routes() {
+    this.app.use("/user", new UserRouter().router);
+  }
 
   start(): void {
     this.app.listen(this.app.get("port"), () => {
@@ -52,4 +36,4 @@ class Applicaction {
   }
 }
 
-export default Applicaction;
+export default App;
