@@ -14,11 +14,12 @@ export default class UserService {
     }
   };
 
-  Update = async (user: Object) => {
+  update = async (id: string, user: Object) => {
     try {
-      const newUser = new User(user);
-      const userSaved = await newUser.save();
-      return userSaved;
+      const userUpdated = await User.updateOne({ idUser: id }, user, {
+        $set: { isModified: true },
+      });
+      return userUpdated;
     } catch (error) {
       console.log(error);
       throw new Error(error.message);
@@ -49,6 +50,17 @@ export default class UserService {
       return jwt.sign({ user }, JWT_SECRET_KEY, {
         expiresIn: 60 * 60 * 24,
       });
+    } catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  };
+
+  delete = async (id: string) => {
+    try {
+      const userDeleted = await User.deleteOne({ idUser: id });
+
+      return userDeleted;
     } catch (error) {
       console.log(error);
       throw new Error(error.message);

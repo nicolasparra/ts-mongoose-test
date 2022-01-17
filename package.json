@@ -32,6 +32,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.11.97",
     "nodemon": "^2.0.15",
     "ts-node": "^10.4.0",
     "tslint": "^6.1.3",

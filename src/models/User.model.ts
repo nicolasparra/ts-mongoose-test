@@ -1,5 +1,6 @@
 import { model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
+import { softDeletePlugin } from "../plugins/softDelete";
 
 const root = "https://s3.amazonaws.com/mybucket";
 
@@ -8,6 +9,8 @@ export interface IUser extends Document {
   name: string;
   password: string;
   comparePassword: (password: string) => Promise<Boolean>;
+  encryptPassword: (password: string) => Promise<string>;
+  softDeleteOne: (option: Object) => Promise<Object>;
 }
 
 const UserSchema: Schema = new Schema(
@@ -38,26 +41,53 @@ const UserSchema: Schema = new Schema(
   }
 );
 
+softDeletePlugin(UserSchema);
+
 function arrayLimit(val) {
   return val.length <= 6;
 }
 
 UserSchema.pre<IUser>("save", async function (next) {
-  const user = this;
+  try {
+    const user = this;
+    if (!user.isModified("password")) return next();
 
-  if (!user.isModified("password")) return next();
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(user.password, salt);
+    user.password = hash;
 
-  const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(user.password, salt);
-  user.password = hash;
-
-  next();
+    next();
+  } catch (error) {
+    next(error.message);
+  }
 });
 
-UserSchema.methods.comparePassword = async function (
-  password: string
-): Promise<Boolean> {
-  return await bcrypt.compare(password, this.password);
+UserSchema.pre("updateOne", async function (next) {
+  try {
+    if (this._update.password) {
+      const salt = await bcrypt.genSaltSync(10);
+      const hashPass = await bcrypt.hashSync(this._update.password, salt);
+      this._update.password = hashPass;
+    }
+
+    next();
+  } catch (error) {
+    next(error.message);
+  }
+});
+
+UserSchema.methods = {
+  comparePassword: async function (password: string): Promise<Boolean> {
+    return await bcrypt.compare(password, this.password);
+  },
+  encryptPassword: async function (plainTextPassword): Promise<string> {
+    if (!plainTextPassword) {
+      return "";
+    } else {
+      const salt = await bcrypt.genSaltSync(10);
+      return await bcrypt.hashSync(plainTextPassword, salt);
+    }
+  },
 };
 
 const User = model<IUser>("User", UserSchema);

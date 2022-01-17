@@ -29,7 +29,23 @@ export default class UserController {
         password,
         picture,
       });
-      return res.status(200).send();
+      return res.status(201).send({ user: user });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  update = async (req: Request, res: Response) => {
+    try {
+      const { name, password, picture } = req.body;
+      const { id } = req.params;
+      console.log(id);
+      const userUpdated = await this.userService.update(id, {
+        name,
+        password,
+        picture,
+      });
+      return res.status(200).send({ user: userUpdated });
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
@@ -38,9 +54,22 @@ export default class UserController {
   login = async (req: Request, res: Response) => {
     try {
       const { name, password } = req.body;
-      const token = await this.userService.login(name, password);
+      if (!name || !password)
+        return res.status(400).send({ message: "Name and password required" });
+      const token = await this.userService.login(name.toLowerCase(), password);
 
       return res.status(200).send({ token: token });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  delete = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userDeleted = await this.userService.delete(id);
+
+      return res.status(200).send({ user: userDeleted });
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
