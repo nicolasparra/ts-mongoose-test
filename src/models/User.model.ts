@@ -10,7 +10,8 @@ export interface IUser extends Document {
   password: string;
   comparePassword: (password: string) => Promise<Boolean>;
   encryptPassword: (password: string) => Promise<string>;
-  softDeleteOne: (option: Object) => Promise<Object>;
+  picture: string;
+  date?: Date;
 }
 
 const UserSchema: Schema = new Schema(
@@ -24,7 +25,7 @@ const UserSchema: Schema = new Schema(
       //Función, mensaje error de validación.
       validate: [arrayLimit, "{PATH} exceeds the limit of 6"],
     },
-    date: { type: Date, default: Date.now, required: false },
+    date: { type: Date, default: Date.now, required: false, alias: "fecha" },
     socialNetworks: {
       type: Map,
       of: String,
@@ -34,6 +35,11 @@ const UserSchema: Schema = new Schema(
       type: String,
       get: (v) => `${root}${v}`,
       required: false,
+    },
+    role: {
+      type: String,
+      enum: ["executive", "admin", "superAdmin"],
+      default: "executive",
     },
   },
   {

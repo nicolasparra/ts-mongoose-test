@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserService from "../services/User.service";
 import { v1 as uuidv1 } from "uuid";
-import User from "../models/User.model";
+import moment from "moment";
 
 export default class UserController {
   userService: UserService;
@@ -13,6 +13,36 @@ export default class UserController {
   getUser = async (req: Request, res: Response) => {
     try {
       const userList = await this.userService.getAll();
+
+      return res.status(200).send({ data: userList });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  getByIdUser = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userList = await this.userService.getByIdUser(id);
+
+      return res.status(200).send({ data: userList });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  getUserByCreatedAt = async (req: Request, res: Response) => {
+    try {
+      const { dateInit, dateEnd } = req.query;
+
+      if (!moment(dateInit).isValid() || !moment(dateEnd).isValid())
+        return res.status(500).send({ message: "Invalid date Format" });
+
+      const userList = await this.userService.getUserByCreatedAt(
+        dateInit,
+        dateEnd
+      );
+
       return res.status(200).send({ data: userList });
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -21,14 +51,17 @@ export default class UserController {
 
   create = async (req: Request, res: Response) => {
     try {
-      const { name, password, picture } = req.body;
+      const { name, password, picture, comments, socialNetworks } = req.body;
       const idUser = uuidv1();
       const user = await this.userService.create({
         idUser,
         name,
         password,
         picture,
+        comments,
+        socialNetworks,
       });
+
       return res.status(201).send({ user: user });
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -39,13 +72,28 @@ export default class UserController {
     try {
       const { name, password, picture } = req.body;
       const { id } = req.params;
-      console.log(id);
       const userUpdated = await this.userService.update(id, {
         name,
         password,
         picture,
       });
+
       return res.status(200).send({ user: userUpdated });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  updateSocialNetworks = async (req: Request, res: Response) => {
+    try {
+      const { socialNetwork } = req.body;
+      const { id } = req.params;
+      const socialNetworkUpdated = await this.userService.updateSocialNetworks(
+        id,
+        socialNetwork
+      );
+
+      return res.status(200).send({ socialNetworkUpdated });
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }

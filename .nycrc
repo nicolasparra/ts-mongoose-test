@@ -1,0 +1,21 @@
+{
+  "include": "src/*",
+  "exclude": [
+    "src/index.ts",
+    "src/app.ts",
+    "src/config.ts",
+    "src/database.ts",
+    "src/controllers/*",
+    "src/models/*",
+    "src/plugins/*",
+    "src/routes/*",
+    "src/seeds/*"
+  ],
+  "all": true,
+  "reporter": [
+    "lcov",
+    "text"
+  ],
+  "check-coverage": true,
+  "lines": 80
+}

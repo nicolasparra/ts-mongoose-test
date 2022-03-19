@@ -21,3 +21,7 @@ export async function connect() {
     console.log("Error");
   }
 }
+
+export async function disconnect() {
+  await mongoose.connection.close();
+}
