@@ -8,6 +8,7 @@ export interface IUser extends Document {
   idUser: string;
   name: string;
   password: string;
+  role: string;
   comparePassword: (password: string) => Promise<Boolean>;
   encryptPassword: (password: string) => Promise<string>;
   picture: string;

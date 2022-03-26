@@ -2,12 +2,14 @@ import User, { IUser } from "../models/User.model";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../config";
 import moment from "moment";
+import xl from "excel4node";
 
 export default class UserService {
   create = async (user: Object) => {
     try {
       const newUser = new User(user);
       const userSaved = await newUser.save();
+
       return userSaved;
     } catch (error) {
       console.log(error);
@@ -117,6 +119,34 @@ export default class UserService {
       const userDeleted = await User.deleteOne({ idUser: id });
 
       return userDeleted;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+  };
+
+  excel = async () => {
+    try {
+      const users = await User.find({}).select("+password");
+      const wb = new xl.Workbook();
+      const ws = wb.addWorksheet("usuarios");
+      const style = wb.createStyle({
+        font: {
+          color: "#FF0800",
+          size: 12,
+        },
+        numberFormat: "$#,##0.00; ($#,##0.00); -",
+      });
+      ws.cell(1, 1).string("Name").style(style);
+      ws.cell(1, 2).string("Role").style(style);
+      let row = 2;
+      users.forEach((user) => {
+        ws.cell(row, 1).string(user.name).style(style);
+        ws.cell(row, 2).string(user.role).style(style);
+        row++;
+      });
+
+      return await wb.writeToBuffer();
     } catch (error) {
       console.log(error);
       throw new Error(error.message);

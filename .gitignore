@@ -2,8 +2,9 @@ node_modules
 dist
 .env
 package-lock.json
-database
-.tmp
+.nyc_output
 coverage
-uploads/*
-!uploads/.gitkeep 
+logs
+data
+launch.json
+ma-salesforce-cliente

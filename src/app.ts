@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import { PORT } from "./config";
+import * as bodyParser from "body-parser";
 
 // Routes
 import UserRouter from "./routes/User.router";
@@ -10,8 +11,8 @@ class App {
 
   constructor() {
     this.app = express();
-    this.settings();
     this.middlewares();
+    this.settings();
     this.routes();
   }
 
@@ -20,9 +21,11 @@ class App {
   }
 
   middlewares() {
+    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(bodyParser.json());
+    // this.app.use(express.urlencoded({ extended: false }));
+    // this.app.use(express.json());
     this.app.use(morgan("dev"));
-    this.app.use(express.urlencoded({ extended: false }));
-    this.app.use(express.json());
   }
 
   routes() {

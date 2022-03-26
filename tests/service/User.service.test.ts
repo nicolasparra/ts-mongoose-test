@@ -2,7 +2,11 @@ import { expect } from "chai";
 import sinon, { StubbedInstance, stubInterface, stubObject } from "ts-sinon";
 import UserService from "../../src/services/User.service";
 import UserModel from "../../src/models/User.model";
+import UserMother from "../objectMother/UserMother";
+
 /*
+
+**** https://betterprogramming.pub/writing-unit-tests-for-your-nodejs-api-13257bd0e46b
 https://medium.com/nowports-tech/unit-crash-testing-c2fc2c4368d7
 https://codeutopia.net/blog/2016/06/10/mongoose-models-and-unit-tests-the-definitive-guide/
 
@@ -13,48 +17,54 @@ https://codesandbox.io/s/d7hbo?file=/src/service.ts:119-126
 https://github.com/jatinpatel136/NoteTakingApp/blob/master/test/controllers/note.controller.spec.js
 */
 
-const startTest = () => {
-  describe("Prueba", () => {
-    it("test", () => {
-      class Test {
-        public someProp: string = "test";
-        methodA() {
-          return "A: original";
-        }
-        methodB() {
-          return "B: original";
-        }
-      }
+const startTest = async () => {
+  describe("User Service - Unit Test", async () => {
+    const userService = new UserService();
+    // it("Hola Mundo", async () => {
+    //   const mockBD = sinon.mock(UserModel);
+    //   mockBD
+    //     .expects("find")
+    //     .once()
+    //     .withArgs({})
+    //     .resolves({ idUser: "1", name: "mock" });
+    //   const response = await userService.getAll();
+    //   expect(response).to.have.property("idUser");
+    //   mockBD.verify();
+    //   mockBD.restore();
+    //   // .yield(null, { algo: "W" }, null);
+    // });
+    it("Save a User", async () => {
+      sinon.stub(UserModel);
+      sinon.stub(UserModel.prototype, "save").returns({
+        idUser: "1",
+        name: "Mother",
+        password: "pass",
+        picture: "LinkPicture",
+        date: new Date(),
+      });
 
-      const test = new Test();
-      // second argument must be existing class method name, in this case only "methodA" or "methodB" are accepted.
-      const testStub = stubObject<Test>(test, ["methodA"]);
-      expect(testStub.methodA()).to.be.undefined;
-      expect(testStub.methodB()).to.equal("B: original");
+      const response = await userService.create({
+        idUser: "1",
+        name: "Mother",
+        password: "pass",
+        picture: "LinkPicture",
+        date: new Date(),
+      });
+
+      expect(response).to.have.property("idUser");
+      expect(response.idUser).to.equal("1");
+
+      /*
+      
+      await getUser({
+        profileId,
+      }).catch((error) => {
+        expect(error.message).to.equal("No user not found with given profileId")
+      });
+      */
     });
   });
 };
-
-// const startTest = () => {
-//   const userService = new UserService();
-//   describe("User Service - Unit Test", async () => {
-//     it("Hola Mundo", async () => {
-//       const mockBD = sinon.mock(UserModel);
-
-//       mockBD
-//         .expects("find")
-//         .once()
-//         .withArgs({})
-//         .resolves({ idUser: "1", name: "mock" });
-
-//       const response = await userService.getAll();
-//       expect(response).to.have.property("idUser");
-//       mockBD.verify();
-//       mockBD.restore();
-//       // .yield(null, { algo: "W" }, null);
-//     });
-//   });
-// };
 
 export default { startTest };
 
@@ -77,69 +87,4 @@ describe("POST /setUsername", function () {
         });
     });
 });
-*/
-
-/*-------------------------------------------------------------------------------------------*/
-/*
-
-import chai from "chai";
-import "mocha";
-import { StubbedInstance, stubInterface } from "ts-sinon";
-import { v1 as uuidv1 } from "uuid";
-import OrderQuery from "../../../../src/manage_orders/order/application/orderQuery";
-import IOrderConnection from "../../../../src/manage_orders/order/domain/IOrder.connection";
-const { expect } = chai;
-
-const startTest = () => {
-	describe("OrderQuery - Uses Case", () => {
-		let orderConnectionMock: StubbedInstance<IOrderConnection> = null;
-		let orderQueryInstance: OrderQuery = null;
-		beforeEach(() => {
-			orderConnectionMock = stubInterface<IOrderConnection>();
-			orderQueryInstance = new OrderQuery(orderConnectionMock);
-		});
-		it("Success call store Procedure", async function () {
-			const body_ordenes = [
-				{
-					numeroOrden: "0030184765",
-					tipoOrden: "INSERT",
-				},
-			];
-			const id: string = uuidv1();
-			const returnOrderOut = await orderQueryInstance.orderQuery(
-				body_ordenes,
-				id
-			);
-			expect(returnOrderOut[0]).to.be.equal(undefined);
-		});
-		it("Failed call store Procedure", async function () {
-			orderConnectionMock.procedureOrder.throws("Nothing data");
-			const body_ordenes = [
-				{
-					numeroOrden: "0030184765",
-					tipoOrden: "INSERT",
-				},
-			];
-			const id: string = uuidv1();
-			const returnOrderOut = await orderQueryInstance.orderQuery(
-				body_ordenes,
-				id
-			);
-			expect(returnOrderOut).to.be.throw;
-		});
-		it("Failed validate Orders", async function () {
-			const body_ordenes = {
-				numeroOrden: "0030184765",
-				tipoOrden: "INSERT",
-			};
-			const id: string = uuidv1();
-			const returnOrderOut = await orderQueryInstance.orderQuery(
-				body_ordenes,
-				id
-			);
-			expect(returnOrderOut).to.be.throw;
-		});
-	});
-};
-export default { startTest };
 */

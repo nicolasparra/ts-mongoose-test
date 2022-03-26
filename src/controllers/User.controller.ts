@@ -12,6 +12,7 @@ export default class UserController {
 
   getUser = async (req: Request, res: Response) => {
     try {
+      console.log("DEBERIA FUNCIONAR");
       const userList = await this.userService.getAll();
 
       return res.status(200).send({ data: userList });
@@ -35,12 +36,15 @@ export default class UserController {
     try {
       const { dateInit, dateEnd } = req.query;
 
-      if (!moment(dateInit).isValid() || !moment(dateEnd).isValid())
+      if (
+        !moment(dateInit.toString()).isValid() ||
+        !moment(dateEnd.toString()).isValid()
+      )
         return res.status(500).send({ message: "Invalid date Format" });
 
       const userList = await this.userService.getUserByCreatedAt(
-        dateInit,
-        dateEnd
+        dateInit.toString(),
+        dateEnd.toString()
       );
 
       return res.status(200).send({ data: userList });
@@ -118,6 +122,23 @@ export default class UserController {
       const userDeleted = await this.userService.delete(id);
 
       return res.status(200).send({ user: userDeleted });
+    } catch (error) {
+      return res.status(500).send({ message: error.message });
+    }
+  };
+
+  excel = async (req: Request, res: Response) => {
+    try {
+      const excelBuffer = await this.userService.excel();
+      res.writeHead(200, {
+        "Content-Length": Buffer.byteLength(excelBuffer),
+        "Content-Type": "application/xlsx",
+        "Content-disposition": `attachment;filename=Usuarios_${moment().format(
+          "DD/MM/YYYY"
+        )}.xlsx`,
+      });
+      res.end(excelBuffer);
+      return res;
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
