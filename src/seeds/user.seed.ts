@@ -26,4 +26,4 @@ const createUsers = async () => {
   }
 };
 
-createUsers;
+createUsers();

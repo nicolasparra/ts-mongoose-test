@@ -3,17 +3,46 @@ import morgan from "morgan";
 import { PORT } from "./config";
 import * as bodyParser from "body-parser";
 
+//GraphQL
+import { buildSchema } from "graphql";
+import { ApolloServer, gql } from "apollo-server-express";
+import { userResolvers } from "./graphql/resolvers/userResolver";
+import { userDefs } from "./graphql/typeDefs/userDefs";
+
 // Routes
 import UserRouter from "./routes/User.router";
+const typeDefs = gql`
+  type Query {
+    hello: String
+  }
+`;
 
+const resolvers = {
+  Query: {
+    hello() {
+      return "world";
+    },
+  },
+};
 class App {
   app: express.Application;
 
   constructor() {
     this.app = express();
     this.middlewares();
+    this.settingGraphQl(this.app, userDefs, userResolvers);
     this.settings();
     this.routes();
+  }
+
+  private async settingGraphQl(app, typeDefs, resolvers) {
+    const apolloServer = new ApolloServer({
+      typeDefs,
+      resolvers,
+    });
+
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app, path: "/gql" });
   }
 
   settings() {
