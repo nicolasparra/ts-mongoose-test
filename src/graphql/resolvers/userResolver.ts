@@ -1,14 +1,11 @@
-// const Task = require("./models/Task");
+import UserService from "../../services/User.service";
+
+const userService = new UserService();
 
 const userResolvers = {
   Query: {
-    hello: () => "Hello world",
-    getAllTasks: async () => {
-      //   const tasks = await Task.find();
-      //   return tasks;
-    },
-    async getTask(_, { id }) {
-      //   return await Task.findById(id);
+    getUsers: async () => {
+      return await userService.getAll();
     },
   },
   Mutation: {

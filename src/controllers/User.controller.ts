@@ -12,7 +12,6 @@ export default class UserController {
 
   getUser = async (req: Request, res: Response) => {
     try {
-      console.log("DEBERIA FUNCIONAR");
       const userList = await this.userService.getAll();
 
       return res.status(200).send({ data: userList });

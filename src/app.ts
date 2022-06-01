@@ -4,26 +4,13 @@ import { PORT } from "./config";
 import * as bodyParser from "body-parser";
 
 //GraphQL
-import { buildSchema } from "graphql";
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer } from "apollo-server-express";
 import { userResolvers } from "./graphql/resolvers/userResolver";
 import { userDefs } from "./graphql/typeDefs/userDefs";
 
 // Routes
 import UserRouter from "./routes/User.router";
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
 
-const resolvers = {
-  Query: {
-    hello() {
-      return "world";
-    },
-  },
-};
 class App {
   app: express.Application;
 
@@ -52,8 +39,6 @@ class App {
   middlewares() {
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json());
-    // this.app.use(express.urlencoded({ extended: false }));
-    // this.app.use(express.json());
     this.app.use(morgan("dev"));
   }
 

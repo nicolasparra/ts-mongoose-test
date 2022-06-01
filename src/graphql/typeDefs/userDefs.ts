@@ -1,15 +1,18 @@
 import { gql } from "apollo-server-express";
 
 const userDefs = gql`
+  type User {
+    idUser: ID
+    name: String
+    password: String
+  }
   type Task {
     id: ID
     title: String
     description: String
   }
   type Query {
-    hello: String
-    getAllTasks: [Task]
-    getTask(id: ID): Task
+    getUsers: [User]
   }
   input TaskInput {
     title: String

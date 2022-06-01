@@ -17,8 +17,9 @@ export async function connect() {
     };
     await mongoose.connect(MONGO_URI, mongoOption);
     console.log(">>> Database connected");
-  } catch {
-    console.log("Error");
+  } catch (error) {
+    console.log("Error" + error.message);
+    throw new Error(error.message);
   }
 }
 
